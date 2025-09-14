@@ -22,6 +22,7 @@ Export and Data Management: 30 samples
 Scientific Research: 80 samples
 Total Required Samples: 1,575
 print(f"Initiating orchestration for category: {category}")
+dont use hugging face models
 
 # Step 2: Define the optimal JSON structure for the category
 for the selected category , define the best structure in the same format as the .json file in the semantic_sample folder and get the best possible content to increase the semantical search 

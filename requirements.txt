@@ -8,6 +8,8 @@ sentence-transformers==2.2.2
 groq==0.4.1
 numpy==1.24.3
 python-dotenv==1.0.0
+tensorflow==2.16.1
+tensorflow-hub==0.16.1
 
 # Web interface dependencies (optional - only if using web interface)
 fastapi==0.104.1

@@ -1,0 +1,318 @@
+
+{
+  "collection_info": {
+    "name": "geographic_spatial_queries",
+    "description": "High-quality geographic and spatial query patterns for FloatChat Indian Ocean ARGO system",
+    "total_documents": 100,
+    "semantic_approach": "Enhanced 10-dimensional context for conversational AI",
+    "data_source": "Indian Ocean ARGO floats (2015-2025)",
+    "regions_covered": ["Arabian Sea", "Bay of Bengal", "Andaman Sea", "Mozambique Channel", "Western Australian Basin", "Northern Indian Ocean"],
+    "user_focus": "Geospatial analysts, oceanographers, researchers",
+    "interface_type": "Conversational chatbot with interactive map dashboard",
+    "last_updated": "2025-09-14",
+    "enhancement_version": "v3.1_floatchat_geo_optimized"
+  },
+  "queries": [
+    {
+      "id": "geo_find_floats_by_point_radius_001",
+      "content": "Find all ARGO floats within a 200km radius of 10°N, 75°E. Which floats are currently operating near this specific point? Show me active floats in this vicinity.",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT f.float_id, f.last_latitude, f.last_longitude, f.current_status, (6371 * ACOS(COS(RADIANS({target_lat})) * COS(RADIANS(f.last_latitude)) * COS(RADIANS(f.last_longitude) - RADIANS({target_lon})) + SIN(RADIANS({target_lat})) * SIN(RADIANS(f.last_latitude)))) AS distance_km FROM floats f WHERE f.last_latitude IS NOT NULL AND f.last_longitude IS NOT NULL HAVING distance_km <= {search_radius} ORDER BY distance_km ASC",
+        "parameters": {
+          "target_lat": {"type": "float", "required": true, "description": "Target latitude in decimal degrees"},
+          "target_lon": {"type": "float", "required": true, "description": "Target longitude in decimal degrees"},
+          "search_radius": {"type": "float", "required": false, "default": 200, "description": "Search radius in kilometers"}
+        },
+        "natural_language_patterns": [
+          "Find floats within {search_radius}km of {target_lat}°N, {target_lon}°E",
+          "Show active floats near {target_lat}, {target_lon}",
+          "Which floats are in the vicinity of these coordinates?"
+        ],
+        "visualization_config": {
+          "primary": "interactive_map_with_floats",
+          "chart_settings": {"map_center": ["target_lat", "target_lon"], "radius_overlay": "search_radius"}
+        },
+        "conversation_followups": [
+          "Show the most recent profile from the closest float.",
+          "What are the temperature and salinity readings from these floats?",
+          "Have any of these floats reported data in the last 30 days?"
+        ],
+        "user_expertise": "intermediate",
+        "indian_ocean_context": "High relevance for specific point analysis in any basin.",
+        "floatchat_integration": {
+          "dashboard_component": "primary_map",
+          "interactive_features": ["map_zoom", "float_selection", "radius_adjustment"]
+        }
+      }
+    },
+    {
+      "id": "geo_get_data_in_bounding_box_002",
+      "content": "Retrieve all temperature and salinity measurements within the Arabian Sea, defined by the coordinates 45°E to 75°E and 8°N to 25°N. What data is available in this specific rectangular area?",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT p.profile_date, p.latitude, p.longitude, m.pressure, m.temperature, m.salinity FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.latitude BETWEEN {lat_min} AND {lat_max} AND p.longitude BETWEEN {lon_min} AND {lon_max} AND m.temperature IS NOT NULL AND m.salinity IS NOT NULL ORDER BY p.profile_date DESC",
+        "parameters": {
+          "lat_min": {"type": "float", "required": true, "description": "Minimum latitude for bounding box"},
+          "lat_max": {"type": "float", "required": true, "description": "Maximum latitude for bounding box"},
+          "lon_min": {"type": "float", "required": true, "description": "Minimum longitude for bounding box"},
+          "lon_max": {"type": "float", "required": true, "description": "Maximum longitude for bounding box"}
+        },
+        "natural_language_patterns": [
+          "Get data within the box {lat_min}-{lat_max}°N, {lon_min}-{lon_max}°E",
+          "Show measurements in the Arabian Sea region.",
+          "What data is available in this rectangular area?"
+        ],
+        "visualization_config": {
+          "primary": "data_density_heatmap",
+          "secondary": "temperature_salinity_map"
+        },
+        "conversation_followups": [
+          "What is the average temperature in this region?",
+          "Show me a T-S diagram for this dataset.",
+          "How does the data density change over time in this box?"
+        ],
+        "user_expertise": "intermediate",
+        "indian_ocean_context": "Core query for regional oceanographic analysis.",
+        "floatchat_integration": {
+          "dashboard_component": "primary_map",
+          "interactive_features": ["bounding_box_tool", "parameter_selection"]
+        }
+      }
+    },
+    {
+      "id": "geo_show_float_trajectory_003",
+      "content": "Display the full trajectory of float 2902182 from its deployment to its last known location. How has this float moved over time? Plot the path of this ARGO float.",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT p.profile_date, p.latitude, p.longitude, p.cycle_number FROM profiles p WHERE p.float_id = {float_id} ORDER BY p.profile_date ASC",
+        "parameters": {
+          "float_id": {"type": "string", "required": true, "description": "ARGO float identifier"}
+        },
+        "natural_language_patterns": [
+          "Show the trajectory of float {float_id}",
+          "Plot the path of float {float_id}",
+          "How has float {float_id} moved over time?"
+        ],
+        "visualization_config": {
+          "primary": "trajectory_map_with_timeline",
+          "chart_settings": {"path_color": "cycle_number", "start_marker": "deployment_location"}
+        },
+        "conversation_followups": [
+          "What was the average speed of this float?",
+          "Did the float cross any major ocean currents?",
+          "Show the temperature profile at the start and end of its journey."
+        ],
+        "user_expertise": "beginner",
+        "indian_ocean_context": "Fundamental for understanding float movement and data coverage.",
+        "floatchat_integration": {
+          "dashboard_component": "primary_map",
+          "interactive_features": ["trajectory_animation", "path_highlighting"]
+        }
+      }
+    },
+    {
+      "id": "geo_compare_data_two_locations_004",
+      "content": "Compare the latest vertical temperature profiles from a float in the Bay of Bengal (around 15°N, 90°E) and one in the Mozambique Channel (around 15°S, 40°E).",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "(SELECT p.latitude, p.longitude, m.pressure, m.temperature FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.profile_id = (SELECT profile_id FROM profiles WHERE latitude BETWEEN 14 AND 16 AND longitude BETWEEN 89 AND 91 ORDER BY profile_date DESC LIMIT 1)) UNION ALL (SELECT p.latitude, p.longitude, m.pressure, m.temperature FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.profile_id = (SELECT profile_id FROM profiles WHERE latitude BETWEEN -16 AND -14 AND longitude BETWEEN 39 AND 41 ORDER BY profile_date DESC LIMIT 1))",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Compare profiles from Bay of Bengal and Mozambique Channel.",
+          "Show temperature differences between two locations.",
+          "Contrast the vertical structure at two distinct points."
+        ],
+        "visualization_config": {
+          "primary": "side_by_side_profile_plot",
+          "chart_settings": {"x_axis": "temperature", "y_axis": "pressure_depth_inverted"}
+        },
+        "conversation_followups": [
+          "What could explain the differences in the thermocline depth?",
+          "Are these differences typical for these regions?",
+          "Show the salinity profiles for the same locations."
+        ],
+        "user_expertise": "expert",
+        "indian_ocean_context": "Crucial for understanding large-scale oceanographic gradients.",
+        "floatchat_integration": {
+          "dashboard_component": "comparison_view",
+          "interactive_features": ["location_selector", "parameter_overlay"]
+        }
+      }
+    },
+    {
+      "id": "geo_find_data_along_transect_005",
+      "content": "Show the sea surface temperature along a transect from 5°N, 80°E to 5°N, 95°E. What are the temperature variations along this specific line of longitude?",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT p.longitude, m.temperature FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.latitude BETWEEN 4.5 AND 5.5 AND p.longitude BETWEEN 80 AND 95 AND m.pressure < 10 ORDER BY p.longitude ASC",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Show surface temperature along the 5°N transect.",
+          "Plot temperature variations along a line from 80°E to 95°E.",
+          "Get data along a specific oceanographic transect."
+        ],
+        "visualization_config": {
+          "primary": "transect_plot",
+          "chart_settings": {"x_axis": "longitude", "y_axis": "temperature"}
+        },
+        "conversation_followups": [
+          "Is there an ocean front visible in this transect?",
+          "How does this compare to the salinity along the same line?",
+          "Show the same transect at a depth of 100 meters."
+        ],
+        "user_expertise": "expert",
+        "indian_ocean_context": "Important for studying ocean fronts and eddies.",
+        "floatchat_integration": {
+          "dashboard_component": "transect_view",
+          "interactive_features": ["transect_drawing_tool", "depth_selection"]
+        }
+      }
+    },
+    {
+      "id": "geo_identify_floats_in_named_region_006",
+      "content": "Which floats have transmitted data from the Andaman Sea in the last year? List all floats that have been active in this specific geographical area recently.",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT DISTINCT p.float_id, f.last_update, f.last_latitude, f.last_longitude FROM profiles p JOIN floats f ON p.float_id = f.float_id WHERE p.latitude BETWEEN 5 AND 15 AND p.longitude BETWEEN 92 AND 98 AND p.profile_date >= DATE('now', '-1 year') ORDER BY f.last_update DESC",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Which floats were in the Andaman Sea last year?",
+          "List active floats in the Andaman Sea.",
+          "Show floats that recently reported from the Andaman Sea."
+        ],
+        "visualization_config": {
+          "primary": "map_with_float_list",
+          "chart_settings": {"region_highlight": "Andaman Sea"}
+        },
+        "conversation_followups": [
+          "Show the trajectories of these floats.",
+          "What is the data coverage like in this region?",
+          "Compare the data from two of these floats."
+        ],
+        "user_expertise": "beginner",
+        "indian_ocean_context": "Useful for monitoring specific, named ocean basins.",
+        "floatchat_integration": {
+          "dashboard_component": "regional_view",
+          "interactive_features": ["region_selector", "float_filtering"]
+        }
+      }
+    },
+    {
+      "id": "geo_find_nearest_float_to_point_007",
+      "content": "What is the closest active ARGO float to the coast of Somalia (e.g., 10°N, 51°E)? And show me its latest data.",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT f.float_id, f.last_latitude, f.last_longitude, (6371 * ACOS(COS(RADIANS(10)) * COS(RADIANS(f.last_latitude)) * COS(RADIANS(f.last_longitude) - RADIANS(51)) + SIN(RADIANS(10)) * SIN(RADIANS(f.last_latitude)))) AS distance_km FROM floats f WHERE f.current_status = 'ACTIVE' ORDER BY distance_km ASC LIMIT 1",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Find the nearest active float to the Somali coast.",
+          "Closest float to 10°N, 51°E.",
+          "Which operational float is nearest to this point?"
+        ],
+        "visualization_config": {
+          "primary": "map_with_single_float",
+          "secondary": "latest_profile_display"
+        },
+        "conversation_followups": [
+          "How far away is it?",
+          "When was its last transmission?",
+          "Show its trajectory over the last 6 months."
+        ],
+        "user_expertise": "intermediate",
+        "indian_ocean_context": "Relevant for piracy monitoring and coastal dynamics.",
+        "floatchat_integration": {
+          "dashboard_component": "quick_find",
+          "interactive_features": ["point_and_click_map", "auto_display_profile"]
+        }
+      }
+    },
+    {
+      "id": "geo_surface_temperature_map_008",
+      "content": "Generate a map of the sea surface temperature for the entire Indian Ocean for the last 30 days. Show me the current surface temperature distribution.",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT p.latitude, p.longitude, m.temperature FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.profile_date >= DATE('now', '-30 days') AND m.pressure < 10 AND m.temperature_qc = 1",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Map of recent sea surface temperature in the Indian Ocean.",
+          "Show the current surface temperature distribution.",
+          "Generate a sea surface temperature map for the last month."
+        ],
+        "visualization_config": {
+          "primary": "gridded_temperature_map",
+          "chart_settings": {"color_palette": "thermal", "contour_lines": true}
+        },
+        "conversation_followups": [
+          "Where are the warmest and coldest spots?",
+          "Can you animate this for the last 12 months?",
+          "Overlay the major ocean currents on this map."
+        ],
+        "user_expertise": "beginner",
+        "indian_ocean_context": "A fundamental visualization for understanding ocean climate.",
+        "floatchat_integration": {
+          "dashboard_component": "primary_map",
+          "interactive_features": ["time_slider", "color_scale_adjustment"]
+        }
+      }
+    },
+    {
+      "id": "geo_deployment_locations_map_009",
+      "content": "Show me a map of all the deployment locations of the ARGO floats in the database. Where were all the floats initially deployed?",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT float_id, deployment_latitude, deployment_longitude, deployment_date, program_name FROM floats",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Map of float deployment locations.",
+          "Where were the floats initially deployed?",
+          "Show the starting points of all floats."
+        ],
+        "visualization_config": {
+          "primary": "symbol_map",
+          "chart_settings": {"symbol_by": "program_name", "tooltip": ["float_id", "deployment_date"]}
+        },
+        "conversation_followups": [
+          "Are there any patterns in the deployment locations?",
+          "Which program deployed the most floats?",
+          "Show the trajectories of floats from a specific deployment region."
+        ],
+        "user_expertise": "beginner",
+        "indian_ocean_context": "Provides context on the spatial distribution of the observation network's origins.",
+        "floatchat_integration": {
+          "dashboard_component": "overview_map",
+          "interactive_features": ["filter_by_program", "click_to_see_trajectory"]
+        }
+      }
+    },
+    {
+      "id": "geo_find_floats_that_crossed_equator_010",
+      "content": "Have any floats crossed the equator? Identify all ARGO floats that have profiles both in the Northern and Southern Hemispheres.",
+      "metadata": {
+        "category": "Geographic/Spatial",
+        "sql_template": "SELECT p.float_id FROM profiles p GROUP BY p.float_id HAVING MIN(p.latitude) < 0 AND MAX(p.latitude) > 0",
+        "parameters": {},
+        "natural_language_patterns": [
+          "Which floats have crossed the equator?",
+          "Show floats with data in both hemispheres.",
+          "Identify cross-equatorial floats."
+        ],
+        "visualization_config": {
+          "primary": "map_with_highlighted_trajectories",
+          "chart_settings": {"highlight_floats_from_query": true}
+        },
+        "conversation_followups": [
+          "Plot the full trajectories of these floats.",
+          "When and where did they cross the equator?",
+          "Compare the water properties before and after crossing."
+        ],
+        "user_expertise": "expert",
+        "indian_ocean_context": "Interesting for studying cross-equatorial transport and dynamics.",
+        "floatchat_integration": {
+          "dashboard_component": "exploratory_analysis_view",
+          "interactive_features": ["trajectory_highlighting", "crossing_point_marker"]
+        }
+      }
+    }
+  ]
+}
