@@ -10,8 +10,7 @@ NEW COMPREHENSIVE RAG SYSTEM
 
 import json
 import chromadb
-import tensorflow as tf
-import tensorflow_hub as hub
+from sentence_transformers import SentenceTransformer
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -28,9 +27,9 @@ class ComprehensiveRAGSystem:
     """Complete RAG system with ChromaDB, Groq API, and visualization"""
 
     def __init__(self, groq_api_key: str = None):
-        self.embedding_model_name = "https://tfhub.dev/google/universal-sentence-encoder/4"
+        self.embedding_model_name = "all-MiniLM-L6-v2"  # More compatible model
         print(f"Loading embedding model: {self.embedding_model_name}")
-        self.embedding_model = hub.load(self.embedding_model_name)
+        self.embedding_model = SentenceTransformer(self.embedding_model_name)
 
         # Initialize ChromaDB in new directory
         self.chroma_path = "./new_comprehensive_chromadb"
@@ -176,11 +175,6 @@ class ComprehensiveRAGSystem:
             ids.append(sample_id)
             metadatas.append(metadata)
 
-        # Generate embeddings
-        print("Generating embeddings for all documents...")
-        embeddings = self.embedding_model(documents)
-        print("Embeddings generated.")
-
         # Add to ChromaDB in batches
         batch_size = 100
         total_added = 0
@@ -189,13 +183,11 @@ class ComprehensiveRAGSystem:
             batch_docs = documents[i:i+batch_size]
             batch_ids = ids[i:i+batch_size]
             batch_metas = metadatas[i:i+batch_size]
-            batch_embeds = embeddings[i:i+batch_size]
 
             self.collection.add(
                 documents=batch_docs,
                 ids=batch_ids,
-                metadatas=batch_metas,
-                embeddings=batch_embeds.numpy().tolist()
+                metadatas=batch_metas
             )
             total_added += len(batch_docs)
             print(f"Added batch {i//batch_size + 1}: {total_added}/{len(documents)} samples")
@@ -211,10 +203,8 @@ class ComprehensiveRAGSystem:
 
         start_time = time.time()
 
-        query_embedding = self.embedding_model([query])
-
         results = self.collection.query(
-            query_embeddings=query_embedding.numpy().tolist(),
+            query_texts=[query],
             n_results=n_results,
             include=['documents', 'metadatas', 'distances']
         )

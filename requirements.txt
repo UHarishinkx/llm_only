@@ -6,17 +6,15 @@ duckdb==0.9.2
 chromadb==0.4.24
 sentence-transformers==2.2.2
 groq==0.4.1
-numpy==1.24.3
+numpy
 python-dotenv==1.0.0
-tensorflow==2.16.1
-tensorflow-hub==0.16.1
 
 # Web interface dependencies (optional - only if using web interface)
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 websockets==12.0
 python-multipart==0.0.6
-pydantic==2.5.0
+pydantic
 jinja2==3.1.2
 
 # Additional utilities

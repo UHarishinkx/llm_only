@@ -1,7 +1,7 @@
 
 import json
+from sentence_transformers import SentenceTransformer, util
 import numpy as np
-import tensorflow_hub as hub
 
 def generate_variations(query_content):
     """Generates variations of a query."""
@@ -43,7 +43,7 @@ def test_similarity():
         print("No queries found in the JSON file.")
         return
 
-    model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+    model = SentenceTransformer('all-MiniLM-L6-v2')
 
     for query in queries:
         query_id = query.get("id")
@@ -56,12 +56,15 @@ def test_similarity():
             print(f"Could not generate enough variations for query: {query_id}")
             continue
 
-        embeddings = model(variations)
+        embeddings = model.encode(variations, convert_to_tensor=True)
         
         # Calculate cosine similarity between the first (original) embedding and all others
-        cosine_scores = np.inner(embeddings[0], embeddings[1:])
+        cosine_scores = util.pytorch_cos_sim(embeddings[0], embeddings[1:])
         
-        avg_score = np.mean(cosine_scores)
+        # Convert to a list of floats
+        scores = cosine_scores.cpu().numpy().flatten().tolist()
+        
+        avg_score = np.mean(scores)
 
         print(f"--- Query ID: {query_id} ---")
         print(f"Original Content: {content}")
