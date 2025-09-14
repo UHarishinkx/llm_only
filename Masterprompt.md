@@ -8,6 +8,19 @@
 ```python
 # Step 1: Interact with the user to get the category
 category = input("Please enter the query category you will be working on (e.g., 'Geographic/Spatial', 'Temporal'): ")
+Basic Data Retrieval: 50 samples
+Geographic/Spatial: 100 samples
+Temporal: 200 samples
+Depth/Vertical Structure: 150 samples
+Parameter-Specific: 300 samples
+Statistical and Analytical: 250 samples
+Comparison: 180 samples
+Quality Control and Data Assessment: 75 samples
+Visualization-Oriented: 120 samples
+Operational/Monitoring: 40 samples
+Export and Data Management: 30 samples
+Scientific Research: 80 samples
+Total Required Samples: 1,575
 print(f"Initiating orchestration for category: {category}")
 
 # Step 2: Define the optimal JSON structure for the category

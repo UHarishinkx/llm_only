@@ -1,53 +1,47 @@
-# ARGO Oceanographic RAG System
 
-This project is a comprehensive Retrieval-Augmented Generation (RAG) system for querying and analyzing ARGO float data. It provides a web interface and an interactive CLI to ask complex oceanographic questions in natural language, get SQL queries, and visualize the results.
 
-## Features
-
-*   **Natural Language Queries:** Ask questions in plain English about ARGO float data.
-*   **Semantic Search:** Uses ChromaDB and sentence transformers to find the most relevant information to answer your query.
-*   **SQL Generation:** Leverages the Groq API and a large language model to generate SQL queries to run against the ARGO data.
-*   **Data Visualization:** Can generate plots and charts from the queried data.
-*   **Web Interface:** A user-friendly web UI built with FastAPI for interacting with the system.
-*   **Interactive CLI:** A command-line interface for direct interaction with the RAG system.
-*   **Parquet Data Support:** Uses DuckDB to efficiently query data stored in Parquet format.
-
-## System Architecture
-
-## Generating Sample Queries: An Autonomous Workflow
-
-To streamline the process of creating high-quality sample queries, we will use a new autonomous workflow. Your task is now simpler, as the Gemini CLI will handle most of the heavy lifting.
-
+## Gener
 ### Your Task: Initiate the Workflow
 
-Your only task is to choose a category from the appendix and use the following simple prompt with the Gemini CLI.
+1. read the setup.md
 
-**Simple Prompt for Team Members:**
+2. install and open the gemini cli in clone project folder
 
-```
-Initiate the autonomous prompt generation workflow for the following category: [Your Query Type Here]
-```
+3. choose a query type from the 12 given query type and give okay for everything it will do everything
 
-Once you provide this prompt, the Gemini CLI will take over and execute the entire process described below.
 
-### Gemini CLI's Autonomous Workflow (for your reference)
+thats all you need to do and verify it is working at the it will open a web and test the query type you choose
 
-For your reference, here is the advanced master prompt that the Gemini CLI will use internally to execute its task. You do not need to use this prompt yourself.
 
----
 
-### Master Prompt for Gemini CLI (v5 - Autonomous Workflow)
 
-**ROLE-PLAY SCENARIO:**
 
-You are an autonomous AI agent, a specialist in RAG system optimization. You have been activated with a specific mission: to generate a complete, self-validated, and perfectly structured set of 10 JSON prompts for a given category.
 
-**MISSION PARAMETERS:**
 
-*   **Category:** `[User-selected category will be injected here]`
-*   **Output File Name:** `semantic_samples/[category_name].json`
 
-**AUTONOMOUS WORKFLOW (Execute these steps in order):**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 **Step 1: Define the Optimal JSON Structure**
 
