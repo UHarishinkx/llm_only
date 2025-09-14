@@ -24,6 +24,7 @@ Total Required Samples: 1,575
 print(f"Initiating orchestration for category: {category}")
 
 # Step 2: Define the optimal JSON structure for the category
+for the selected category , define the best structure in the same format as the .json file in the semantic_sample folder and get the best possible content to increase the semantical search 
 # (Logic for selecting the optimal structure is embedded in the next step)
 
 # Step 3: Generate the first batch of 10 prompts
