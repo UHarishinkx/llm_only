@@ -27,7 +27,8 @@ print(f"Initiating orchestration for category: {category}")
 # (Logic for selecting the optimal structure is embedded in the next step)
 
 # Step 3: Generate the first batch of 10 prompts
-print("---"Generating Batch 1 (Prompts 1-10) ---")
+print("---"Generating Batch 1 (Prompts 1-10) ---") 
+the prompt should be generated in such a way that it covers most of the user queries and it should be uniqe and different from each other and it should be well defined and it is formed in such a way that it have unique semantically similarity , which can be easily extracted using rag
 
 # Step 3a: Generate the JSON prompts
 # (You will now generate the 10 JSON prompts for the specified category.
