@@ -1,0 +1,12 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "python main.py"
+healthcheckPath = "/api/status"
+healthcheckTimeout = 60
+restartPolicyType = "always"
+
+[environments.production.variables]
+PORT = "8000"
+PYTHONPATH = "/app"
