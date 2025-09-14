@@ -61,7 +61,7 @@ the prompt should be generated in such a way that it covers most of the user que
 
 # Step 3f: Analyze and refine
 # (You will now analyze the "imagined" output of the test script.
-# If any prompts have an average similarity score below 0.85, you will generate a new, improved version of the JSON object.
+# If any prompts have an average similarity score below 0.2, you will generate a new, improved version of the JSON object.
 # In the new version, you will modify the `content` of the low-scoring prompts.)
 
 # Step 3g: Update the JSON file with refined prompts
