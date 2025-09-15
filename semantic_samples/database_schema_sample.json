@@ -1,0 +1,80 @@
+{
+  "samples": [
+    {
+      "id": "schema_float_temperature_minmax",
+      "query": "get min max temperature for float id",
+      "sql_template": "SELECT MIN(m.temperature) as min_temp, MAX(m.temperature) as max_temp FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.float_id = '{float_id}' AND m.temperature IS NOT NULL",
+      "parameters": {
+        "float_id": "2900826"
+      },
+      "metadata": {
+        "category": "temperature_analysis",
+        "complexity": "simple",
+        "data_scope": "float_specific",
+        "schema_notes": "QC flags are integers (1,2,3) not strings. Temperature can be negative. Float IDs are strings.",
+        "sql_template": "SELECT MIN(m.temperature) as min_temp, MAX(m.temperature) as max_temp FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.float_id = '{float_id}' AND m.temperature IS NOT NULL"
+      },
+      "visualization": {
+        "type": "none",
+        "description": "Simple min/max results display"
+      },
+      "expected_result": "Returns minimum and maximum temperature values for the specified float"
+    },
+    {
+      "id": "schema_comprehensive_float_temperature",
+      "query": "temperature range statistics for float including quality control",
+      "sql_template": "SELECT MIN(m.temperature) as min_temp, MAX(m.temperature) as max_temp, AVG(m.temperature) as avg_temp, COUNT(*) as measurement_count, COUNT(CASE WHEN m.temperature_qc = 1 THEN 1 END) as good_quality_count FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.float_id = '{float_id}' AND m.temperature IS NOT NULL",
+      "parameters": {
+        "float_id": "2900826"
+      },
+      "metadata": {
+        "category": "temperature_analysis",
+        "complexity": "moderate",
+        "data_scope": "float_specific",
+        "schema_notes": "Critical: temperature_qc is integer type (1,2,3), not string ('1','2','3'). Use IN (1,2) not IN ('1','2')",
+        "sql_template": "SELECT MIN(m.temperature) as min_temp, MAX(m.temperature) as max_temp, AVG(m.temperature) as avg_temp, COUNT(*) as measurement_count, COUNT(CASE WHEN m.temperature_qc = 1 THEN 1 END) as good_quality_count FROM profiles p JOIN measurements m ON p.profile_id = m.profile_id WHERE p.float_id = '{float_id}' AND m.temperature IS NOT NULL"
+      },
+      "visualization": {
+        "type": "summary_stats",
+        "description": "Temperature statistics with quality breakdown"
+      },
+      "expected_result": "Comprehensive temperature statistics including quality control breakdown"
+    },
+    {
+      "id": "schema_database_structure",
+      "query": "database schema table structure relationships",
+      "sql_template": "-- ARGO Database Schema: floats (767) -> profiles (42K) -> measurements (7.1M)\n-- Key join: profiles.profile_id = measurements.profile_id\n-- Float specific: profiles.float_id = 'XXXXXX'\n-- QC flags are integers: temperature_qc IN (1,2) not ('1','2')",
+      "parameters": {},
+      "metadata": {
+        "category": "schema_reference",
+        "complexity": "reference",
+        "data_scope": "schema",
+        "schema_notes": "Database has 3 main tables: floats (metadata), profiles (dive cycles), measurements (sensor data). 7.1M measurements total. QC flags are integers.",
+        "sql_template": "-- Schema reference: Use proper integer QC flags and string float_ids"
+      },
+      "visualization": {
+        "type": "none",
+        "description": "Schema documentation"
+      },
+      "expected_result": "Database schema and relationship information"
+    },
+    {
+      "id": "schema_quality_control_examples",
+      "query": "quality control flags temperature data filtering examples",
+      "sql_template": "-- Quality options:\n-- Strict: WHERE temperature_qc IN (1, 2)\n-- Include questionable: WHERE temperature_qc IN (1, 2, 3)\n-- All data: WHERE temperature IS NOT NULL\n-- Ultra-strict: WHERE temperature_qc = 1",
+      "parameters": {},
+      "metadata": {
+        "category": "data_quality",
+        "complexity": "reference",
+        "data_scope": "quality_control",
+        "schema_notes": "QC flags: 1=good, 2=probably good, 3=probably bad, 4=bad. Always use integers not strings.",
+        "sql_template": "-- Quality control reference for temperature filtering"
+      },
+      "visualization": {
+        "type": "none",
+        "description": "Quality control guidelines"
+      },
+      "expected_result": "Quality control filtering options and best practices"
+    }
+  ]
+}
