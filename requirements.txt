@@ -11,7 +11,11 @@ streamlit-folium>=0.13.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
 pyarrow>=12.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
 
-# Optional dependencies (install only if needed)
+# Optional dependencies (commented out - install only if needed)
 # sentence-transformers>=2.2.0  # Only for advanced embeddings (not required)
 # huggingface-hub>=0.16.0       # Only if using sentence-transformers
+# fastapi>=0.104.1              # Only for API interface
+# uvicorn[standard]>=0.24.0     # Only for API interface
