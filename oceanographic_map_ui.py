@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 import random
 from datetime import datetime, timedelta
+import json
 
 # Set page configuration
 st.set_page_config(
@@ -115,6 +116,64 @@ st.markdown("""
         flex: 1;
     }
 
+    /* Float popup styling */
+    .float-popup {
+        font-family: Arial, sans-serif;
+        max-width: 350px;
+        padding: 0;
+    }
+    
+    .float-popup-header {
+        background: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+    }
+    
+    .float-popup-options {
+        padding: 10px 0;
+    }
+    
+    .float-popup-option {
+        display: block;
+        padding: 12px 20px;
+        color: #007bff;
+        text-decoration: none;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    
+    .float-popup-option:hover {
+        background-color: #f8f9fa;
+        text-decoration: none;
+    }
+    
+    .float-popup-details {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .float-popup-detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 12px;
+    }
+    
+    .float-popup-detail-label {
+        font-weight: bold;
+        color: #666;
+    }
+    
+    .float-popup-detail-value {
+        color: #333;
+        text-align: right;
+    }
     /* Checkbox styling */
     .parameter-item {
         display: flex;
@@ -218,15 +277,34 @@ def generate_sample_data():
         pressures = np.random.exponential(1.5, num_points) * 1000  # Depth in meters
         years = np.random.choice([2021, 2022, 2023, 2024, 2025], num_points, p=[0.1, 0.15, 0.25, 0.35, 0.15])
         parameters = np.random.choice(['BBP470', 'BBP532', 'BBP700', 'CDOM'], num_points, p=[0.3, 0.25, 0.25, 0.2])
+        
+        # Generate float metadata
+        float_ids = np.random.choice(range(1900000, 1999999), num_points)
+        cycles = np.random.randint(1, 200, num_points)
+        pis = np.random.choice(['Stephanie Correard', 'John Smith', 'Maria Garcia', 'Ahmed Hassan', 'Li Wei'], num_points)
+        platform_types = np.random.choice(['ARVOR', 'APEX', 'SOLO', 'NAVIS'], num_points, p=[0.4, 0.3, 0.2, 0.1])
+        telecom_codes = np.random.choice(['IRIDIUM', 'ARGOS', 'INMARSAT'], num_points, p=[0.6, 0.3, 0.1])
+        sensors = np.random.choice(['CTD_TEMP, CTD_CNDC, CTD_PRES', 'CTD_TEMP, CTD_PRES', 'CTD_TEMP, CTD_CNDC, CTD_PRES, DOXY'], num_points, p=[0.5, 0.3, 0.2])
 
         for i in range(num_points):
+            # Generate realistic date
+            days_ago = np.random.randint(1, 365)
+            profile_date = datetime.now() - timedelta(days=days_ago)
+            
             all_points.append({
                 'lat': lats[i],
                 'lon': lons[i],
                 'pressure': pressures[i],
                 'year': years[i],
                 'parameter': parameters[i],
-                'days_ago': np.random.randint(1, 3650)  # Random days for filtering
+                'days_ago': days_ago,
+                'float_id': float_ids[i],
+                'cycle': cycles[i],
+                'pi': pis[i],
+                'platform_type': platform_types[i],
+                'telecom_code': telecom_codes[i],
+                'sensors': sensors[i],
+                'profile_date': profile_date.strftime('%d/%m/%Y %H:%M:%S')
             })
 
     return pd.DataFrame(all_points)
@@ -262,6 +340,79 @@ def filter_data(df, time_filter, pressure_range, parameters, years):
         filtered_df = filtered_df[filtered_df['year'].isin(year_ints)]
 
     return filtered_df
+def create_float_popup_html(row):
+    """Create HTML content for float popup"""
+    popup_html = f"""
+    <div class="float-popup">
+        <div class="float-popup-header">
+            Float {row['float_id']} - Cycle {row['cycle']}
+        </div>
+        
+        <div class="float-popup-options">
+            <a href="#" class="float-popup-option" onclick="showProfileData({row['float_id']}, {row['cycle']})">
+                Show profile data
+            </a>
+            <a href="#" class="float-popup-option" onclick="showFloatTrajectory({row['float_id']})">
+                Show float trajectory
+            </a>
+            <a href="#" class="float-popup-option" onclick="goToFloatPage({row['float_id']})">
+                Go to float page
+            </a>
+        </div>
+        
+        <div class="float-popup-details">
+            <div class="float-popup-detail-row">
+                <span class="float-popup-detail-label">Date</span>
+                <span class="float-popup-detail-value">{row['profile_date']}</span>
+            </div>
+            <div class="float-popup-detail-row">
+                <span class="float-popup-detail-label">Platform Type</span>
+                <span class="float-popup-detail-value">{row['platform_type']}</span>
+            </div>
+            <div class="float-popup-detail-row">
+                <span class="float-popup-detail-label">PI</span>
+                <span class="float-popup-detail-value">{row['pi']}</span>
+            </div>
+            <div class="float-popup-detail-row">
+                <span class="float-popup-detail-label">Telecom Code</span>
+                <span class="float-popup-detail-value">{row['telecom_code']}</span>
+            </div>
+            <div class="float-popup-detail-row">
+                <span class="float-popup-detail-label">Sensors</span>
+                <span class="float-popup-detail-value">{row['sensors']}</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showProfileData(floatId, cycle) {{
+            // Store the selection in session state and trigger rerun
+            window.parent.postMessage({{
+                type: 'float_action',
+                action: 'show_profile',
+                float_id: floatId,
+                cycle: cycle
+            }}, '*');
+        }}
+        
+        function showFloatTrajectory(floatId) {{
+            window.parent.postMessage({{
+                type: 'float_action',
+                action: 'show_trajectory',
+                float_id: floatId
+            }}, '*');
+        }}
+        
+        function goToFloatPage(floatId) {{
+            window.parent.postMessage({{
+                type: 'float_action',
+                action: 'go_to_page',
+                float_id: floatId
+            }}, '*');
+        }}
+    </script>
+    """
+    return popup_html
 
 def create_world_map(filtered_data):
     """Create the main interactive world map"""
@@ -290,29 +441,28 @@ def create_world_map(filtered_data):
         control=True
     ).add_to(m)
 
-    # Add data points as yellow circles
+    # Add data points as interactive float markers
     for idx, row in filtered_data.iterrows():
         if idx > 2000:  # Limit points for performance
             break
 
+        # Create popup content
+        popup_html = create_float_popup_html(row)
+        popup = folium.Popup(
+            html=popup_html,
+            max_width=400,
+            min_width=350
+        )
+
         folium.CircleMarker(
             location=[row['lat'], row['lon']],
-            radius=3,
-            popup=f"""
-            <div style="font-family: Arial, sans-serif;">
-                <b>Oceanographic Data Point</b><br>
-                <b>Location:</b> {row['lat']:.2f}°, {row['lon']:.2f}°<br>
-                <b>Pressure:</b> {row['pressure']:.0f} m<br>
-                <b>Parameter:</b> {row['parameter']}<br>
-                <b>Year:</b> {row['year']}<br>
-                <b>Days ago:</b> {row['days_ago']}
-            </div>
-            """,
-            tooltip=f"{row['parameter']} - {row['year']}",
+            radius=4,
+            popup=popup,
+            tooltip=f"Float {row['float_id']} - {row['parameter']}",
             color='#ffd700',
             weight=1,
             fillColor='#ffd700',
-            fillOpacity=0.8
+            fillOpacity=0.9
         ).add_to(m)
 
     # Add layer control
@@ -325,6 +475,14 @@ def create_world_map(filtered_data):
 
 # Main layout
 def main():
+    # Initialize session state for float actions
+    if 'selected_float_action' not in st.session_state:
+        st.session_state.selected_float_action = None
+    if 'selected_float_id' not in st.session_state:
+        st.session_state.selected_float_id = None
+    if 'selected_cycle' not in st.session_state:
+        st.session_state.selected_cycle = None
+
     # Page header
     st.markdown("""
     <div style="background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
@@ -348,7 +506,32 @@ def main():
 
     with col2:
         create_map_panel()
+        
+        # Handle float actions (this would be expanded based on your needs)
+        if st.session_state.selected_float_action:
+            handle_float_action()
 
+def handle_float_action():
+    """Handle actions triggered from float popup"""
+    action = st.session_state.selected_float_action
+    float_id = st.session_state.selected_float_id
+    cycle = st.session_state.selected_cycle
+    
+    if action == 'show_profile':
+        st.success(f"Showing profile data for Float {float_id}, Cycle {cycle}")
+        # Here you would implement the actual profile data display
+        # This could open a new section, modal, or redirect to another page
+        
+    elif action == 'show_trajectory':
+        st.success(f"Showing trajectory for Float {float_id}")
+        # Here you would implement trajectory visualization
+        
+    elif action == 'go_to_page':
+        st.success(f"Navigating to Float {float_id} page")
+        # Here you would implement navigation to float-specific page
+    
+    # Reset the action
+    st.session_state.selected_float_action = None
 def create_control_panel():
     """Create the left control and filter panel"""
 
@@ -501,8 +684,17 @@ def create_map_panel():
         world_map,
         width='100%',
         height=700,
-        returned_objects=["last_object_clicked", "bounds"]
+        returned_objects=["last_object_clicked", "bounds"],
+        key="main_map"
     )
+
+    # Handle map interactions
+    if map_data['last_object_clicked']:
+        # This would be triggered when a marker is clicked
+        # You can extract information from the clicked object
+        clicked_data = map_data['last_object_clicked']
+        if clicked_data:
+            st.write("Debug - Clicked object:", clicked_data)
 
     # Map statistics
     col1, col2, col3, col4 = st.columns(4)
